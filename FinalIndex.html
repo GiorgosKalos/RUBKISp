@@ -51,7 +51,7 @@
     </a-assets>
     
     <a-sky src="#skyTexture"></a-sky>
-  // Lighting-Shadows
+  <!-- Lighting-Shadows -->
   <a-entity light="ambient; intensity:0.7"></a-entity>
   <a-entity light="directional; intensity:5; castShadow: true; color:#EDEAE0;" position="-3 6 0"></a-entity>
   <a-entity light="point; intensity: 1.50; distance: 20;" position="0 4 2"></a-entity>
@@ -59,9 +59,9 @@
   <a-entity light="point; intensity: 1; distance: 20;" position="0 3 -8"></a-entity>
  
   <a-entity id="cube-cluster"></a-entity>
-  // Plane
+  <!-- Plane -->
   <a-plane position="0 0 -4" rotation="-90 0 0" width="15" height="15" color="#6a95ff" shadow="receive: true"></a-plane>
-  // Camera
+  <!-- Camera -->
   <a-entity position="0 2 5">
     <a-camera look-controls wasd-controls></a-camera>
   </a-entity>
@@ -195,3 +195,4 @@ window.scrambleCube = scrambleCube;
 </body>
 
 </html>
+
