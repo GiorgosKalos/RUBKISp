@@ -6,10 +6,12 @@
   <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
   <style>
     body { margin:0; overflow:hidden; background:#111; font-family:sans-serif; }
+    /* UI */
     #rubiks-menu {
       position:absolute; top:20px; left:20px; z-index:100;
       display:flex; flex-wrap:wrap; gap:12px; max-width:380px;
     }
+    /* Knob UI and half buttons */
     .control-knob { width:50px; height:50px; background:white; border-radius:50%; position:relative; overflow:hidden; }
     .half-btn { position:absolute; width:50%; height:100%; border:none; cursor:pointer; }
     .half-btn.left { left:0; background:#ff6b6b; }
@@ -18,6 +20,7 @@
       position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
       font-weight:900; pointer-events:none;
     }
+    /* Scamble button UI */
     .scramble-container { position:absolute; bottom:30px; left:50%; transform:translateX(-50%); z-index:100; }
     .scramble-btn { padding:12px 24px; font-size:1.2rem; font-weight:bold; border-radius:8px; border:none; background:#f39c12; color:white; }
   </style>
@@ -48,7 +51,7 @@
     </a-assets>
     
     <a-sky src="#skyTexture"></a-sky>
-
+  // Lighting-Shadows
   <a-entity light="ambient; intensity:0.7"></a-entity>
   <a-entity light="directional; intensity:5; castShadow: true; color:#EDEAE0;" position="-3 6 0"></a-entity>
   <a-entity light="point; intensity: 1.50; distance: 20;" position="0 4 2"></a-entity>
@@ -56,9 +59,9 @@
   <a-entity light="point; intensity: 1; distance: 20;" position="0 3 -8"></a-entity>
  
   <a-entity id="cube-cluster"></a-entity>
-
+  // Plane
   <a-plane position="0 0 -4" rotation="-90 0 0" width="15" height="15" color="#6a95ff" shadow="receive: true"></a-plane>
-
+  // Camera
   <a-entity position="0 2 5">
     <a-camera look-controls wasd-controls></a-camera>
   </a-entity>
@@ -69,7 +72,7 @@ const cubeSize = 0.8;
 const cubelets = [];
 const cluster = document.getElementById('cube-cluster');
 
-// 🔹 ALL slices, INCLUDING M
+// Center Facet Calc
 const sliceDefs = {
   U:  { center:[0,3,-3], axis:'y', angle:-90, match:(x,y,z)=>y===3 },
   D:  { center:[0,1,-3], axis:'y', angle:-90, match:(x,y,z)=>y===1 },
@@ -77,14 +80,12 @@ const sliceDefs = {
   R:  { center:[1,2,-3], axis:'x', angle: 90, match:(x,y,z)=>x===1 },
   F:  { center:[0,2,-2], axis:'z', angle:-90, match:(x,y,z)=>z===-2 },
   B:  { center:[0,2,-4], axis:'z', angle:-90, match:(x,y,z)=>z===-4 },
-
-  // MIDDLE SLICES
   Mx: { center:[0,2,-3], axis:'x', angle: 90, match:(x,y,z)=>x===0 },
   My: { center:[0,2,-3], axis:'y', angle:-90, match:(x,y,z)=>y===2 },
   Mz: { center:[0,2,-3], axis:'z', angle:-90, match:(x,y,z)=>z===-3 },
 };
 
-// CREATE CUBE
+// Creating the cube
 for (let y of [1,2,3]) {
   for (let x of [-1,0,1]) {
     for (let z of [-2,-3,-4]) {
@@ -105,8 +106,8 @@ for (let y of [1,2,3]) {
   }
 }
 
-// ANIMATION HELPER
-// Manually animates Position (Lerp) and Rotation (Slerp)
+
+// Animating Position and Rotation 
 function animateMove(el, targetPos, targetQuat, duration) {
   const startPos = el.object3D.position.clone();
   const startQuat = el.object3D.quaternion.clone();
@@ -135,7 +136,7 @@ function animateMove(el, targetPos, targetQuat, duration) {
   requestAnimationFrame(loop);
 }
 
-// CORE ROTATION
+// Core rotation
 function rotateSlice(move) {
   const neg = move.endsWith('_N');
   const key = neg ? move.replace('_N','') : move;
@@ -152,7 +153,7 @@ function rotateSlice(move) {
     def.match(+el.dataset.x,+el.dataset.y,+el.dataset.z)
   ).forEach(el => {
     
-    // 1. Calculate Target Position
+    // Calculate target position
     const currentPos = el.object3D.position.clone();
     // Rotate point around pivot
     currentPos.sub(pivot).applyAxisAngle(axis, rad).add(pivot);
@@ -164,21 +165,21 @@ function rotateSlice(move) {
       Math.round(currentPos.z)
     );
 
-    // 2. Calculate Target Rotation
+    // Calculate Target Rotation
     const q = new THREE.Quaternion().setFromAxisAngle(axis, rad);
     const targetQuat = el.object3D.quaternion.clone().premultiply(q);
 
-    // 3. Update Logical Coordinates Immediately
+    // Update Logical Coordinates Immediately
     el.dataset.x = targetPos.x;
     el.dataset.y = targetPos.y;
     el.dataset.z = targetPos.z;
 
-    // 4. Trigger Animation
+    // Trigger Animation
     animateMove(el, targetPos, targetQuat, 500);
   });
 }
 
-// SCRAMBLE
+// Scramble function
 async function scrambleCube() {
   const moves = Object.keys(sliceDefs).flatMap(m=>[m,m+'_N']);
   for(let i=0;i<15;i++){
@@ -192,4 +193,5 @@ window.scrambleCube = scrambleCube;
 </script>
 
 </body>
+
 </html>
